@@ -1,0 +1,197 @@
+import 'package:dryve_test/models/brand.dart';
+import 'package:dryve_test/models/color.dart';
+import 'package:dryve_test/pages/home/components/brand_row.dart';
+import 'package:dryve_test/pages/home/components/color_select_circle.dart';
+import 'package:dryve_test/pages/home/components/filter_sheet_button.dart';
+import 'package:dryve_test/pages/home/components/sheet_top_bar.dart';
+import 'package:dryve_test/pages/home/home_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+const kStrongBlueColor = Color(0xff0065ff);
+
+Map<String, Color> linkToColors = {
+  "1": Colors.white,
+  "2": Colors.grey,
+  "3": Colors.black,
+  "4": Colors.red,
+};
+
+class FilterSheetWidget extends StatelessWidget {
+  const FilterSheetWidget({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final HomeController controller =
+        Provider.of<HomeController>(context, listen: false);
+
+    return SafeArea(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          height: 650,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              SheetTopBarWidget(),
+              SizedBox(height: 20),
+              Text(
+                "Marca",
+                style: TextStyle(
+                  color: Color(0xff1e2c4c),
+                  fontFamily: "CircularStd",
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 25),
+              TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color(0xffd3d5dc),
+                    ),
+                  ),
+                  hintText: "Buscar por nome...",
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 11,
+                    horizontal: 16,
+                  ),
+                  suffixIcon: Icon(Icons.search, size: 24),
+                ),
+              ),
+              SizedBox(height: 25),
+              Consumer<HomeController>(
+                builder: (_, controller, __) {
+                  List<BrandModel> brandsList = controller.brandsList;
+
+                  return Column(
+                    children: <Widget>[
+                      ...List.generate(brandsList.length, (index) {
+                        bool isSelected = controller.model.filterModel.brandsIds
+                            .contains(int.parse(brandsList[index].brandId));
+
+                        return BrandRowWidget(
+                          brand: brandsList[index],
+                          isSelected: isSelected,
+                        );
+                      }),
+                    ],
+                  );
+                },
+              ),
+              SizedBox(height: 16),
+              Divider(color: Color(0xffdddddd), thickness: 1),
+              SizedBox(height: 20),
+              Text(
+                "Cor",
+                style: TextStyle(
+                  color: Color(0xff1e2c4c),
+                  fontFamily: "CircularStd",
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 20),
+              Consumer<HomeController>(
+                builder: (_, controller, __) {
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    childAspectRatio: 3.1,
+                    children:
+                        List.generate(controller.colorsList.length, (index) {
+                      ColorModel color = controller.colorsList[index];
+                      bool isSelected = controller.model.filterModel.colorsIds
+                            .contains(int.parse(color.colorId));
+
+                      return ColorSelectCircleWidget(
+                        isSelected: isSelected,
+                        color: linkToColors[color.colorId],
+                        label: color.name,
+                        colorId: color.colorId,
+                      );
+                    }),
+                  );
+                },
+              ),
+              // Row(
+              //   children: <Widget>[
+              //     ColorSelectCircleWidget(
+              //       color: Colors.white,
+              //       label: "Branco",
+              //     ),
+              //     SizedBox(width: 20),
+              //     ColorSelectCircleWidget(
+              //       color: Colors.black,
+              //       label: "Preto",
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(height: 20),
+              // Row(
+              //   children: <Widget>[
+              //     ColorSelectCircleWidget(
+              //       color: Colors.grey,
+              //       label: "Prata",
+              //     ),
+              //     SizedBox(width: 20),
+              //     ColorSelectCircleWidget(
+              //       color: Colors.red,
+              //       label: "Vermelho",
+              //     ),
+              //   ],
+              // ),
+              SizedBox(height: 20),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: FilterSheetButtonWidget(
+                      onPressed: () {
+                        controller.clearFilters();
+
+                        Navigator.pop(context);
+                      },
+                      label: "Limpar",
+                      labelColor: kStrongBlueColor,
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: FilterSheetButtonWidget(
+                      onPressed: () {
+                        controller.filterVehicles();
+
+                        Navigator.pop(context);
+                      },
+                      label: "Aplicar",
+                      backgroundColor: kStrongBlueColor,
+                      labelColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
