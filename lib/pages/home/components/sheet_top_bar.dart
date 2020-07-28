@@ -7,30 +7,33 @@ class SheetTopBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        IconButton(
-          padding: EdgeInsets.zero,
-          constraints: BoxConstraints(),
-          icon: Image.asset("assets/chevron_down.png"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        Expanded(
-          child: Center(
-            child: Text(
-              "Filtrar",
-              style: TextStyle(
-                color: Color(0xff1e2c4c),
-                fontFamily: "CircularStd",
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+    return Container(
+      margin: EdgeInsets.only(top: 5, bottom: 10),
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(),
+            icon: Image.asset("assets/chevron_down.png"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                "Filtrar",
+                style: TextStyle(
+                  color: Color(0xff1e2c4c),
+                  fontFamily: "CircularStd",
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

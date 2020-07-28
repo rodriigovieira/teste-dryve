@@ -27,57 +27,58 @@ class FilterSheetWidget extends StatelessWidget {
     final HomeController controller =
         Provider.of<HomeController>(context, listen: false);
 
-    return SafeArea(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 15,
-          ),
-          height: 645,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ),
+        child: SafeArea(
+          child: Wrap(
             children: <Widget>[
               SheetTopBarWidget(),
-              SizedBox(height: 20),
-              Text(
-                "Marca",
-                style: TextStyle(
-                  color: Color(0xff1e2c4c),
-                  fontFamily: "CircularStd",
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
+              Container(
+                margin: EdgeInsets.only(top: 15),
+                child: Text(
+                  "Marca",
+                  style: TextStyle(
+                    color: Color(0xff1e2c4c),
+                    fontFamily: "CircularStd",
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-              SizedBox(height: 25),
-              TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color(0xffd3d5dc),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 25),
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xffd3d5dc),
+                      ),
                     ),
+                    hintText: "Buscar por nome...",
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 11,
+                      horizontal: 16,
+                    ),
+                    suffixIcon: Icon(Icons.search, size: 24),
                   ),
-                  hintText: "Buscar por nome...",
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 11,
-                    horizontal: 16,
-                  ),
-                  suffixIcon: Icon(Icons.search, size: 24),
                 ),
               ),
-              SizedBox(height: 25),
               Consumer<HomeController>(
                 builder: (_, controller, __) {
                   List<BrandModel> brandsList = controller.brandsList;
@@ -100,19 +101,25 @@ class FilterSheetWidget extends StatelessWidget {
                   );
                 },
               ),
-              SizedBox(height: 16),
-              Divider(color: Color(0xffdddddd), thickness: 1),
-              SizedBox(height: 20),
-              Text(
-                "Cor",
-                style: TextStyle(
-                  color: Color(0xff1e2c4c),
-                  fontFamily: "CircularStd",
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
+              Container(
+                margin: EdgeInsets.only(top: 16),
+                child: Divider(
+                  color: Color(0xffdddddd),
+                  thickness: 1,
                 ),
               ),
-              SizedBox(height: 20),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  "Cor",
+                  style: TextStyle(
+                    color: Color(0xff1e2c4c),
+                    fontFamily: "CircularStd",
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
               Consumer<HomeController>(
                 builder: (_, controller, __) {
                   List<ColorModel> colors = controller.colorsList;
@@ -140,36 +147,37 @@ class FilterSheetWidget extends StatelessWidget {
                   );
                 },
               ),
-              SizedBox(height: 20),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: FilterSheetButtonWidget(
-                      onPressed: () {
-                        controller.clearFilters();
+              Container(
+                margin: EdgeInsets.only(top: 15, bottom: 5),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: FilterSheetButtonWidget(
+                        onPressed: () {
+                          controller.clearFilters();
 
-                        Navigator.pop(context);
-                      },
-                      label: "Limpar",
-                      labelColor: kStrongBlueColor,
-                      backgroundColor: Colors.white,
+                          Navigator.pop(context);
+                        },
+                        label: "Limpar",
+                        labelColor: kStrongBlueColor,
+                        backgroundColor: Colors.white,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: FilterSheetButtonWidget(
-                      onPressed: () {
-                        controller.filterVehicles();
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: FilterSheetButtonWidget(
+                        onPressed: () {
+                          controller.filterVehicles();
 
-                        Navigator.pop(context);
-                      },
-                      label: "Aplicar",
-                      backgroundColor: kStrongBlueColor,
-                      labelColor: Colors.white,
+                          Navigator.pop(context);
+                        },
+                        label: "Aplicar",
+                        backgroundColor: kStrongBlueColor,
+                        labelColor: Colors.white,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

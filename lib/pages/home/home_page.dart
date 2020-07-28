@@ -11,16 +11,16 @@ class HomePage extends StatelessWidget {
     final _controller = Provider.of<HomeController>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _controller.fetchVehicles,
-          child: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 10,
-              ),
+      body: RefreshIndicator(
+        onRefresh: _controller.fetchVehicles,
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 10,
+            ),
+            child: SafeArea(
               child: Column(
                 children: <Widget>[
                   TopMenuWidget(),
