@@ -1,17 +1,12 @@
+import 'package:dryve_test/interfaces/vehicles_repository.dart';
 import 'package:dryve_test/models/brand.dart';
 import 'package:dryve_test/models/color.dart';
 import 'package:dryve_test/models/filter.dart';
 import 'package:dryve_test/models/vehicle.dart';
-import 'package:dryve_test/repository/vehicles.dart';
-import 'package:dryve_test/services/http_client.dart';
 import 'package:flutter/material.dart';
 
 class HomeController extends ChangeNotifier {
-  VehiclesRepository vehiclesRepository = VehiclesRepository(
-    client: ClientHttpService(
-      baseUrl: "https://run.mocky.io/v3",
-    ),
-  );
+  final IVehiclesRepository vehiclesRepository;
 
   final filterModel = FilterModel();
 
@@ -31,7 +26,7 @@ class HomeController extends ChangeNotifier {
   List<BrandModel> get brandsList => _brandsList;
   List<ColorModel> get colorsList => _colorsList;
 
-  HomeController() {
+  HomeController({@required this.vehiclesRepository}) {
     fetchVehicles();
     fetchBrands();
     fetchColors();

@@ -8,7 +8,13 @@ import 'package:mockito/mockito.dart';
 class MockClient extends Mock implements IClientHttp {}
 
 main() {
-  final controller = HomeController();
+  final mock = MockClient();
+
+  final controller = HomeController(
+    vehiclesRepository: VehiclesRepository(
+      client: mock,
+    ),
+  );
 
   final mockModel = VehicleModel(
     brandId: 1,
@@ -24,15 +30,9 @@ main() {
     transmissionType: "Automático",
   );
 
-  final repository = VehiclesRepository(
-    client: MockClient(),
-  );
-
-  controller.vehiclesRepository = repository;
-
   test("should fetch vehicles", () async {
-    when(repository.getVehicles()).thenAnswer((_) {
-      return Future.value([mockModel]);
+    when(mock.get(VehiclesRepository.kVehiclesPathUrl)).thenAnswer((_) {
+      return Future.value([mockModel.toJson()]);
     });
 
     await controller.fetchVehicles();

@@ -1,13 +1,14 @@
 import 'package:dryve_test/interfaces/http_client.dart';
+import 'package:dryve_test/interfaces/vehicles_repository.dart';
 import 'package:dryve_test/models/brand.dart';
 import 'package:dryve_test/models/color.dart';
 import 'package:dryve_test/models/vehicle.dart';
 
-const String kVehiclesPathUrl = "/e2fe4deb-f65d-45e2-b548-39c17f08e637";
-const String kColorsPathUrl = "/ac466e17-58a4-432b-8647-7a2e4c4074e2";
-const String kBrandsPathUrl = "/4f858a89-17b2-4e9c-82e0-5cdce6e90d29";
-
-class VehiclesRepository {
+class VehiclesRepository implements IVehiclesRepository {
+  static const String kVehiclesPathUrl = "/e2fe4deb-f65d-45e2-b548-39c17f08e637";
+  static const String kColorsPathUrl = "/ac466e17-58a4-432b-8647-7a2e4c4074e2";
+  static const String kBrandsPathUrl = "/4f858a89-17b2-4e9c-82e0-5cdce6e90d29";
+  
   VehiclesRepository({this.client});
 
   IClientHttp client;
