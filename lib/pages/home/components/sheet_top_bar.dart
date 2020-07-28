@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class SheetTopBarWidget extends StatelessWidget {
@@ -28,15 +27,6 @@ class SheetTopBarWidget extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
-            ),
-          ),
-        ),
-        Opacity(
-          opacity: 0,
-          child: IgnorePointer(
-            child: IconButton(
-              icon: Image.asset("assets/chevron_down.png"),
-              onPressed: () {},
             ),
           ),
         ),

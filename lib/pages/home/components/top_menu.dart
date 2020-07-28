@@ -1,5 +1,7 @@
 import 'package:dryve_test/pages/home/components/filter_sheet.dart';
+import 'package:dryve_test/pages/home/home_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class TopMenuWidget extends StatelessWidget {
   const TopMenuWidget({
@@ -41,10 +43,18 @@ class TopMenuWidget extends StatelessWidget {
             ),
           ),
         ),
-        IconButton(
-          icon: Icon(Icons.tune),
-          onPressed: () => _handleFilter(context),
-        )
+        Consumer<HomeController>(
+          builder: (_, controller, __) {
+            bool brandsAndColorsLoaded = controller.brandsList.isNotEmpty &&
+                controller.colorsList.isNotEmpty;
+
+            return IconButton(
+              icon: Icon(Icons.tune),
+              onPressed:
+                  brandsAndColorsLoaded ? () => _handleFilter(context) : null,
+            );
+          },
+        ),
       ],
     );
   }

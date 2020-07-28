@@ -29,11 +29,7 @@ class BrandRowWidget extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 5),
       child: InkWell(
         onTap: () {
-          if (isSelected) {
-            controller.removeBrandFromFilterModel(brand.brandId);
-          } else {
-            controller.addBrandToFilterModel(brand.brandId);
-          }
+          controller.addOrRemoveBrandFromFilter(brand.brandId);
         },
         child: Row(
           children: <Widget>[

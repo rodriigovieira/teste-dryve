@@ -41,8 +41,11 @@ class FilterSheetWidget extends StatelessWidget {
               topRight: Radius.circular(15),
             ),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          height: 650,
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 15,
+          ),
+          height: 645,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -82,11 +85,14 @@ class FilterSheetWidget extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       ...List.generate(brandsList.length, (index) {
-                        bool isSelected = controller.model.filterModel.brandsIds
-                            .contains(int.parse(brandsList[index].brandId));
+                        BrandModel brand = brandsList[index];
+                        List<int> brandsIds = controller.filterModel.brandsIds;
+
+                        bool isSelected =
+                            brandsIds.contains(int.parse(brand.brandId));
 
                         return BrandRowWidget(
-                          brand: brandsList[index],
+                          brand: brand,
                           isSelected: isSelected,
                         );
                       }),
@@ -109,16 +115,20 @@ class FilterSheetWidget extends StatelessWidget {
               SizedBox(height: 20),
               Consumer<HomeController>(
                 builder: (_, controller, __) {
+                  List<ColorModel> colors = controller.colorsList;
+
                   return GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     childAspectRatio: 3.1,
-                    children:
-                        List.generate(controller.colorsList.length, (index) {
-                      ColorModel color = controller.colorsList[index];
-                      bool isSelected = controller.model.filterModel.colorsIds
-                            .contains(int.parse(color.colorId));
+                    children: List.generate(colors.length, (index) {
+                      ColorModel color = colors[index];
+                      List<int> colorsIds = controller.filterModel.colorsIds;
+
+                      bool isSelected = colorsIds.contains(
+                        int.parse(color.colorId),
+                      );
 
                       return ColorSelectCircleWidget(
                         isSelected: isSelected,
@@ -130,33 +140,6 @@ class FilterSheetWidget extends StatelessWidget {
                   );
                 },
               ),
-              // Row(
-              //   children: <Widget>[
-              //     ColorSelectCircleWidget(
-              //       color: Colors.white,
-              //       label: "Branco",
-              //     ),
-              //     SizedBox(width: 20),
-              //     ColorSelectCircleWidget(
-              //       color: Colors.black,
-              //       label: "Preto",
-              //     ),
-              //   ],
-              // ),
-              // SizedBox(height: 20),
-              // Row(
-              //   children: <Widget>[
-              //     ColorSelectCircleWidget(
-              //       color: Colors.grey,
-              //       label: "Prata",
-              //     ),
-              //     SizedBox(width: 20),
-              //     ColorSelectCircleWidget(
-              //       color: Colors.red,
-              //       label: "Vermelho",
-              //     ),
-              //   ],
-              // ),
               SizedBox(height: 20),
               Row(
                 children: <Widget>[

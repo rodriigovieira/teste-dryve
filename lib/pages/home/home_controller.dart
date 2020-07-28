@@ -1,49 +1,76 @@
-import 'package:dio/dio.dart';
 import 'package:dryve_test/models/brand.dart';
 import 'package:dryve_test/models/color.dart';
-import 'package:dryve_test/models/home_controller.dart';
+import 'package:dryve_test/models/filter.dart';
 import 'package:dryve_test/models/vehicle.dart';
+import 'package:dryve_test/repository/vehicles.dart';
 import 'package:flutter/material.dart';
 
 class HomeController extends ChangeNotifier {
-  HomeControllerModel model = HomeControllerModel();
+  final vehiclesRepository = VehiclesRepository();
+  final filterModel = FilterModel();
 
-  List<VehicleModel> get vehiclesList => model.vehiclesList;
-  List<BrandModel> get brandsList => model.brandsList;
-  List<ColorModel> get colorsList => model.colorsList;
+  List<VehicleModel> _listWithoutFilters = [];
 
-  void addBrandToFilterModel(String brandId) {
-    model.filterModel.brandsIds.add(int.parse(brandId));
+  bool _loading = true;
+  bool _hasError = false;
+
+  List<VehicleModel> _vehiclesList = [];
+  List<BrandModel> _brandsList = [];
+  List<ColorModel> _colorsList = [];
+
+  bool get loading => _loading;
+  bool get hasError => _hasError;
+
+  List<VehicleModel> get vehiclesList => _vehiclesList;
+  List<BrandModel> get brandsList => _brandsList;
+  List<ColorModel> get colorsList => _colorsList;
+
+  HomeController() {
+    fetchVehicles();
+    fetchBrands();
+    fetchColors();
+  }
+
+  void addOrRemoveBrandFromFilter(String brandId) {
+    List<int> filteredBrandsIds = filterModel.brandsIds;
+
+    bool alreadySelected = filteredBrandsIds.contains(int.parse(brandId));
+
+    if (alreadySelected) {
+      filteredBrandsIds.remove(int.parse(brandId));
+    } else {
+      filteredBrandsIds.add(int.parse(brandId));
+    }
+
     notifyListeners();
   }
 
-  void removeBrandFromFilterModel(String brandId) {
-    model.filterModel.brandsIds.remove(int.parse(brandId));
-    notifyListeners();
-  }
+  void addOrRemoveColorFromFilter(String colorId) {
+    List<int> filteredColorsIds = filterModel.colorsIds;
 
-  void addColorToFilterModel(String colorId) {
-    model.filterModel.colorsIds.add(int.parse(colorId));
-    notifyListeners();
-  }
+    bool alreadySelected = filteredColorsIds.contains(int.parse(colorId));
 
-  void removeColorFromFilterModel(String colorId) {
-    model.filterModel.colorsIds.remove(int.parse(colorId));
+    if (alreadySelected) {
+      filteredColorsIds.remove(int.parse(colorId));
+    } else {
+      filteredColorsIds.add(int.parse(colorId));
+    }
+
     notifyListeners();
   }
 
   void filterVehicles() {
-    List<VehicleModel> filteredVehicles =
-        model.listWithoutFilters.where((VehicleModel vehicle) {
-      List<int> brandsIds = model.filterModel.brandsIds;
-      List<int> colorsIds = model.filterModel.colorsIds;
+    List<int> brandsIds = filterModel.brandsIds;
+    List<int> colorsIds = filterModel.colorsIds;
 
+    if (brandsIds.isEmpty && colorsIds.isEmpty) {
+      return clearFilters();
+    }
+
+    List<VehicleModel> filteredVehicles =
+        _listWithoutFilters.where((VehicleModel vehicle) {
       bool userSelectedColor = colorsIds.contains(vehicle.colorId);
       bool userSelectedBrand = brandsIds.contains(vehicle.brandId);
-
-      if (brandsIds.isEmpty && colorsIds.isEmpty) {
-        return true;
-      }
 
       if (brandsIds.isEmpty) {
         return userSelectedColor;
@@ -56,81 +83,62 @@ class HomeController extends ChangeNotifier {
       return userSelectedBrand && userSelectedColor;
     }).toList();
 
-    model.vehiclesList = filteredVehicles;
+    _vehiclesList = filteredVehicles;
 
     notifyListeners();
   }
 
   void clearFilters() {
-    model.vehiclesList = model.listWithoutFilters;
+    filterModel.colorsIds = [];
+    filterModel.brandsIds = [];
+    
+    _vehiclesList = _listWithoutFilters;
 
     notifyListeners();
   }
 
   Future<void> fetchColors() async {
-    model.colorsList = [];
+    try {
+      List colors = await vehiclesRepository.getVehiclesColors();
 
-    const String colorsApiUrl =
-        "https://run.mocky.io/v3/ac466e17-58a4-432b-8647-7a2e4c4074e2";
-
-    Dio().get(colorsApiUrl).then((Response res) {
-      for (Map<String, dynamic> color in res.data) {
-        ColorModel colorModel = ColorModel.fromJson(color);
-
-        model.colorsList.add(colorModel);
-      }
-
+      _colorsList = colors;
       notifyListeners();
-    }).catchError((DioError e) {});
+    } catch (e) {
+      handleError();
+    }
   }
 
   Future<void> fetchBrands() async {
-    model.brandsList = [];
+    try {
+      List brands = await vehiclesRepository.getVehiclesBrands();
 
-    const String brandsApiUrl =
-        "https://run.mocky.io/v3/4f858a89-17b2-4e9c-82e0-5cdce6e90d29";
-
-    Dio().get(brandsApiUrl).then((Response res) {
-      for (Map<String, dynamic> brand in res.data) {
-        BrandModel brandModel = BrandModel.fromJson(brand);
-
-        model.brandsList.add(brandModel);
-      }
-
+      _brandsList = brands;
       notifyListeners();
-    }).catchError((DioError e) {});
+    } catch (e) {
+      handleError();
+    }
   }
 
   Future<void> fetchVehicles() async {
-    fetchColors();
-    fetchBrands();
-
-    model.vehiclesList = [];
-
-    const String vehicleApiUrl =
-        "https://run.mocky.io/v3/e2fe4deb-f65d-45e2-b548-39c17f08e637";
+    _loading = true;
+    _hasError = false;
+    notifyListeners();
 
     try {
-      Response response = await Dio().get(vehicleApiUrl);
+      List vehicles = await vehiclesRepository.getVehicles();
 
-      for (Map<String, dynamic> vehicle in response.data) {
-        VehicleModel vehicleModel = VehicleModel.fromJson(vehicle);
-
-        model.vehiclesList.add(vehicleModel);
-      }
-
-      model.listWithoutFilters = model.vehiclesList;
-
+      _vehiclesList = vehicles;
+      _listWithoutFilters = vehicles;
+      _loading = false;
       notifyListeners();
-    } on DioError catch (e) {
-      if (e.response != null) {
-        print(e.response.data);
-        print(e.response.headers);
-        print(e.response.request);
-      } else {
-        print(e.request);
-        print(e.message);
-      }
+    } catch (e) {
+      handleError();
     }
+  }
+
+  void handleError() {
+    _loading = false;
+    _hasError = true;
+    notifyListeners();
   }
 }

@@ -23,11 +23,7 @@ class ColorSelectCircleWidget extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        if (isSelected) {
-          controller.removeColorFromFilterModel(colorId);
-        } else {
-          controller.addColorToFilterModel(colorId);
-        }
+        controller.addOrRemoveColorFromFilter(colorId);
       },
       child: Row(
         children: <Widget>[
