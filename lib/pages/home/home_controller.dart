@@ -3,10 +3,16 @@ import 'package:dryve_test/models/color.dart';
 import 'package:dryve_test/models/filter.dart';
 import 'package:dryve_test/models/vehicle.dart';
 import 'package:dryve_test/repository/vehicles.dart';
+import 'package:dryve_test/services/http_client.dart';
 import 'package:flutter/material.dart';
 
 class HomeController extends ChangeNotifier {
-  final vehiclesRepository = VehiclesRepository();
+  VehiclesRepository vehiclesRepository = VehiclesRepository(
+    client: ClientHttpService(
+      baseUrl: "https://run.mocky.io/v3",
+    ),
+  );
+
   final filterModel = FilterModel();
 
   List<VehicleModel> _listWithoutFilters = [];
@@ -91,7 +97,7 @@ class HomeController extends ChangeNotifier {
   void clearFilters() {
     filterModel.colorsIds = [];
     filterModel.brandsIds = [];
-    
+
     _vehiclesList = _listWithoutFilters;
 
     notifyListeners();
@@ -126,6 +132,7 @@ class HomeController extends ChangeNotifier {
 
     try {
       List vehicles = await vehiclesRepository.getVehicles();
+      print(vehicles);
 
       _vehiclesList = vehicles;
       _listWithoutFilters = vehicles;
