@@ -1,21 +1,16 @@
 import 'package:dryve_test/models/vehicle.dart';
+import 'package:dryve_test/pages/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class GridItemWidget extends StatefulWidget {
+class GridItemWidget extends StatelessWidget {
   final VehicleModel model;
 
   const GridItemWidget({
     Key key,
     @required this.model,
   }) : super(key: key);
-
-  @override
-  _GridItemWidgetState createState() => _GridItemWidgetState();
-}
-
-class _GridItemWidgetState extends State<GridItemWidget> {
-  bool isFavorite = false;
 
   String getPriceFormatted(int price) {
     final NumberFormat numberFormat = NumberFormat.currency(
@@ -28,6 +23,8 @@ class _GridItemWidgetState extends State<GridItemWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<HomeController>(context, listen: false);
+
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,9 +33,22 @@ class _GridItemWidgetState extends State<GridItemWidget> {
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  widget.model.imageUrl,
-                  fit: BoxFit.fill,
+                child: ShaderMask(
+                  blendMode: BlendMode.darken,
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.1),
+                        Colors.transparent,
+                      ],
+                    ).createShader(bounds);
+                  },
+                  child: Image.network(
+                    model.imageUrl,
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
               Positioned(
@@ -46,12 +56,10 @@ class _GridItemWidgetState extends State<GridItemWidget> {
                 right: 0,
                 child: IconButton(
                   icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    model.isFavorite ? Icons.favorite : Icons.favorite_border,
                   ),
                   onPressed: () {
-                    setState(() {
-                      isFavorite = !isFavorite;
-                    });
+                    controller.addOrRemoveFromFavorites(model.id);
                   },
                   color: Colors.white,
                 ),
@@ -62,7 +70,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
           Row(
             children: <Widget>[
               Text(
-                "${widget.model.brandName} ",
+                "${model.brandName} ",
                 style: TextStyle(
                   fontFamily: "CircularStd",
                   color: Color(0xff4b5670),
@@ -71,7 +79,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
                 ),
               ),
               Text(
-                "${widget.model.modelName}",
+                "${model.modelName}",
                 style: TextStyle(
                   fontFamily: "CircularStd",
                   color: Color(0xff0065ff),
@@ -85,7 +93,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
           Row(
             children: <Widget>[
               Text(
-                "${widget.model.modelYear}",
+                "${model.modelYear}",
                 style: TextStyle(
                   fontFamily: "CircularStd",
                   color: Color(0xff768095),
@@ -99,7 +107,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
                 margin: EdgeInsets.symmetric(horizontal: 7),
               ),
               Text(
-                "${widget.model.fuelType}",
+                "${model.fuelType}",
                 style: TextStyle(
                   fontFamily: "CircularStd",
                   color: Color(0xff768095),
@@ -113,7 +121,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
             children: <Widget>[
               Expanded(
                 child: Text(
-                  "${widget.model.transmissionType}",
+                  "${model.transmissionType}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -131,7 +139,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
               ),
               Expanded(
                 child: Text(
-                  "${widget.model.mileage}km",
+                  "${model.mileage}km",
                   style: TextStyle(
                     fontFamily: "CircularStd",
                     color: Color(0xff768095),
@@ -143,7 +151,7 @@ class _GridItemWidgetState extends State<GridItemWidget> {
           ),
           SizedBox(height: 3),
           Text(
-            getPriceFormatted(widget.model.price),
+            getPriceFormatted(model.price),
             style: TextStyle(
               color: Color(0xff1e2c4c),
               fontSize: 16,

@@ -45,13 +45,48 @@ class TopMenuWidget extends StatelessWidget {
         ),
         Consumer<HomeController>(
           builder: (_, controller, __) {
+            int brandsFiltered = controller.filterModel.brandsIds.length;
+            int colorsFiltered = controller.filterModel.colorsIds.length;
             bool brandsAndColorsLoaded = controller.brandsList.isNotEmpty &&
                 controller.colorsList.isNotEmpty;
 
-            return IconButton(
-              icon: Icon(Icons.tune),
-              onPressed:
-                  brandsAndColorsLoaded ? () => _handleFilter(context) : null,
+            int quantityOfFilters = brandsFiltered + colorsFiltered;
+
+            return Stack(
+              children: [
+                IconButton(
+                  constraints: BoxConstraints(),
+                  padding: EdgeInsets.all(4),
+                  icon: Icon(Icons.tune),
+                  iconSize: 28,
+                  onPressed: brandsAndColorsLoaded
+                      ? () => _handleFilter(context)
+                      : null,
+                ),
+                if (quantityOfFilters > 0)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      height: 16,
+                      width: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xff0065ff),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "$quantityOfFilters",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             );
           },
         ),

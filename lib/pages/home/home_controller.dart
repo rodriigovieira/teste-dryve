@@ -3,14 +3,17 @@ import 'package:dryve_test/models/brand.dart';
 import 'package:dryve_test/models/color.dart';
 import 'package:dryve_test/models/filter.dart';
 import 'package:dryve_test/models/vehicle.dart';
+import 'package:dryve_test/services/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 
 class HomeController extends ChangeNotifier {
   final IVehiclesRepository vehiclesRepository;
 
   final filterModel = FilterModel();
+  final sharedModel = SharedPreferencesStorage();
 
   List<VehicleModel> _listWithoutFilters = [];
+  List<BrandModel> _brandsWithoutFilters = [];
 
   bool _loading = true;
   bool _hasError = false;
@@ -30,6 +33,72 @@ class HomeController extends ChangeNotifier {
     fetchVehicles();
     fetchBrands();
     fetchColors();
+  }
+
+  Future<void> loadFavorites() async {
+    final String idsString = await sharedModel.get(
+      SharedPreferencesStorage.kFavoritesKey,
+    );
+
+    if (idsString == null) return;
+
+    List<String> idsList = idsString.split(",");
+
+    for (VehicleModel vehicle in _vehiclesList) {
+      if (idsList.contains(vehicle.id)) {
+        vehicle.isFavorite = true;
+      } else {
+        vehicle.isFavorite = false;
+      }
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> addOrRemoveFromFavorites(String id) async {
+    String idsString = await sharedModel.get(
+      SharedPreferencesStorage.kFavoritesKey,
+    );
+
+    if (idsString == null) idsString = "";
+
+    List<String> idsList = idsString.split(",");
+
+    if (idsList.contains(id)) {
+      idsList.remove(id);
+    } else {
+      idsList.add(id);
+    }
+
+    String newIdsString = idsList.join(",");
+
+    await sharedModel.put(
+      SharedPreferencesStorage.kFavoritesKey,
+      newIdsString,
+    );
+
+    await loadFavorites();
+  }
+
+  void clearBrandFilters() {
+    _brandsList = _brandsWithoutFilters;
+    notifyListeners();
+  }
+
+  void filterBrands(String newText) {
+    if (newText.isEmpty) {
+      return clearBrandFilters();
+    }
+
+    filterModel.searchText = newText;
+
+    _brandsList = _brandsWithoutFilters.where((element) {
+      String vehicleName = element.name.toLowerCase();
+
+      return vehicleName.contains(newText.toLowerCase());
+    }).toList();
+
+    notifyListeners();
   }
 
   void addOrRemoveBrandFromFilter(String brandId) {
@@ -114,6 +183,7 @@ class HomeController extends ChangeNotifier {
       List brands = await vehiclesRepository.getVehiclesBrands();
 
       _brandsList = brands;
+      _brandsWithoutFilters = brands;
       notifyListeners();
     } catch (e) {
       handleError();
@@ -127,11 +197,12 @@ class HomeController extends ChangeNotifier {
 
     try {
       List vehicles = await vehiclesRepository.getVehicles();
-      print(vehicles);
 
       _vehiclesList = vehicles;
       _listWithoutFilters = vehicles;
       _loading = false;
+
+      await loadFavorites();
       notifyListeners();
     } catch (e) {
       handleError();

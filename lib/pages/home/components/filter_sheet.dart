@@ -26,6 +26,9 @@ class FilterSheetWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final HomeController controller =
         Provider.of<HomeController>(context, listen: false);
+    final searchController = TextEditingController(
+      text: controller.filterModel.searchText,
+    );
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -63,6 +66,9 @@ class FilterSheetWidget extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(vertical: 25),
                 child: TextField(
+                  controller: searchController,
+                  autocorrect: false,
+                  onChanged: controller.filterBrands,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide(

@@ -10,6 +10,7 @@ class VehicleModel {
   int price;
   int brandId;
   int colorId;
+  bool isFavorite = false;
 
   VehicleModel({
     this.id,
@@ -53,7 +54,7 @@ class VehicleModel {
     data['price'] = this.price;
     data['brand_id'] = this.brandId;
     data['color_id'] = this.colorId;
-    
+
     return data;
   }
 }
